@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -188,7 +187,7 @@ fun QuestionCard(
             .fillMaxWidth()
             .padding(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1A1A2E)
+            containerColor = Color(0xFF1A1A1A)
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -203,49 +202,18 @@ fun QuestionCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // App icon
-                    val (color1, color2) = Pair(0xFF667eea, 0xFF764ba2)
-
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(color1),
-                                        Color(color2)
-                                    )
-                                )
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = app.name.take(1).uppercase(),
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Column {
-                        Text(
-                            text = app.name,
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Wants to be unrestricted",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 11.sp
-                        )
-                    }
+                Column {
+                    Text(
+                        text = app.name,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Wants to be unrestricted",
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 12.sp
+                    )
                 }
 
                 // Progress indicator
@@ -260,134 +228,76 @@ fun QuestionCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Timer display
-            Card(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isTimerComplete)
-                        Color.Green.copy(alpha = 0.1f)
-                    else
-                        Color(0xFFFF6B35).copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(12.dp)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = if (isTimerComplete) Icons.Default.CheckCircle else Icons.Default.Timer,
-                            contentDescription = null,
-                            tint = if (isTimerComplete) Color.Green else Color(0xFFFF6B35),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (isTimerComplete)
-                                "Time to reflect complete ✓"
-                            else
-                                "Take a moment to think... $timeLeft seconds",
-                            color = if (isTimerComplete) Color.Green else Color(0xFFFF6B35),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                Text(
+                    text = if (isTimerComplete)
+                        "Time to reflect complete ✓"
+                    else
+                        "Take a moment to think... $timeLeft seconds",
+                    color = if (isTimerComplete) Color.Green else Color.White.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
 
-                    // Circular timer indicator
-                    Box(
-                        modifier = Modifier.size(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            progress = { (5 - timeLeft) / 5f },
-                            modifier = Modifier.size(24.dp),
-                            color = if (isTimerComplete) Color.Green else Color(0xFFFF6B35),
-                            strokeWidth = 2.dp,
-                        )
-                        Text(
-                            text = if (isTimerComplete) "✓" else timeLeft.toString(),
-                            color = if (isTimerComplete) Color.Green else Color(0xFFFF6B35),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                // Simple timer indicator
+                Text(
+                    text = if (isTimerComplete) "✓" else timeLeft.toString(),
+                    color = if (isTimerComplete) Color.Green else Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Progress bar
+            // Progress indicator
             LinearProgressIndicator(
                 progress = { questionNumber.toFloat() / totalQuestions.toFloat() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-                color = Color(0xFF667eea),
-                trackColor = Color.White.copy(alpha = 0.1f),
+                    .height(2.dp),
+                color = Color.White,
+                trackColor = Color.White.copy(alpha = 0.3f),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Question card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2D2D44)
-                ),
-                shape = RoundedCornerShape(16.dp)
+            // Question
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                ) {
-                    // Question icon
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Psychology,
-                            contentDescription = null,
-                            tint = Color(0xFFFF6B35),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Honest moment:",
-                            color = Color(0xFFFF6B35),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                Text(
+                    text = "Honest moment:",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    // Main question
-                    Text(
-                        text = question.question,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 22.sp
-                    )
+                // Main question
+                Text(
+                    text = question.question,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 22.sp
+                )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    // Subtitle
-                    Text(
-                        text = question.subtitle,
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 13.sp,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                        lineHeight = 18.sp
-                    )
-                }
+                // Subtitle
+                Text(
+                    text = question.subtitle,
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 13.sp,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    lineHeight = 18.sp
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -405,28 +315,18 @@ fun QuestionCard(
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = Color.White,
+                        contentColor = Color.Black,
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f),
+                        disabledContentColor = Color.Gray
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = if (questionNumber == totalQuestions) Icons.Default.LockOpen else Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = if (isTimerComplete) Color.White else Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (questionNumber == totalQuestions) "Yes, Unrestrict App" else "Yes, Continue",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isTimerComplete) Color.White else Color.Gray
-                        )
-                    }
+                    Text(
+                        text = if (questionNumber == totalQuestions) "Yes, Unrestrict App" else "Yes, Continue",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
 
                 // No button (keep restriction) - always enabled
@@ -438,63 +338,29 @@ fun QuestionCard(
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color.White
                     ),
-                    border = BorderStroke(1.dp, Color.Red.copy(alpha = 0.5f)),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Block,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.Red.copy(alpha = 0.8f)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "No, Keep Restricted",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Red.copy(alpha = 0.8f)
-                        )
-                    }
+                    Text(
+                        text = "No, Keep Restricted",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Motivational footer
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.Blue.copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Lightbulb,
-                        contentDescription = null,
-                        tint = Color.Blue,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (isTimerComplete)
-                            "Great! You've taken time to reflect. Now choose mindfully."
-                        else
-                            "Use these $timeLeft seconds to honestly consider your motivation",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 11.sp,
-                        lineHeight = 14.sp
-                    )
-                }
-            }
+            Text(
+                text = if (isTimerComplete)
+                    "Great! You've taken time to reflect. Now choose mindfully."
+                else
+                    "Use these $timeLeft seconds to honestly consider your motivation",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 11.sp,
+                lineHeight = 14.sp
+            )
         }
     }
 }

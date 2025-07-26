@@ -4,14 +4,12 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,7 +48,7 @@ fun TimePickerDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF1A1A2E)
+                containerColor = Color(0xFF1A1A1A)
             ),
             shape = RoundedCornerShape(20.dp)
         ) {
@@ -62,77 +60,41 @@ fun TimePickerDialog(
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF667eea),
-                                        Color(0xFF764ba2)
-                                    )
-                                )
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = app.name.take(1).uppercase(),
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "Set Time Restriction",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Set Time Restriction",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = app.name,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 14.sp
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White.copy(alpha = 0.7f)
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = app.name,
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 14.sp
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Info card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Blue.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = null,
-                            tint = Color.Blue,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Choose when this app will be available (1-2 hours only)",
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
+                // Info text
+                Text(
+                    text = "Choose when this app will be available (1-2 hours only)",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -176,66 +138,42 @@ fun TimePickerDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Preview card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isValidRange)
-                            Color.Green.copy(alpha = 0.1f)
-                        else
-                            Color.Red.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                // Preview
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = if (isValidRange) Icons.Default.AccessTime else Icons.Default.Error,
-                                contentDescription = null,
-                                tint = if (isValidRange) Color.Green else Color.Red,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (isValidRange) "Preview:" else "Invalid Range:",
-                                color = if (isValidRange) Color.Green else Color.Red,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                    Text(
+                        text = if (isValidRange) "Preview:" else "Invalid Range:",
+                        color = if (isValidRange) Color.White else Color.Red,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                        if (isValidRange) {
-                            Text(
-                                text = "Available: ${timeRange}",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = "Duration: ${String.format("%.1f", timeRange.getDurationHours())} hours",
-                                color = Color.White.copy(alpha = 0.6f),
-                                fontSize = 12.sp
-                            )
-                        } else {
-                            val duration = timeRange.getDurationHours()
-                            val errorMessage = when {
-                                duration < 1f -> "Duration must be at least 1 hour"
-                                duration > 2f -> "Duration cannot exceed 2 hours"
-                                else -> "Invalid time range"
-                            }
-                            Text(
-                                text = errorMessage,
-                                color = Color.Red.copy(alpha = 0.8f),
-                                fontSize = 12.sp
-                            )
+                    if (isValidRange) {
+                        Text(
+                            text = "Available: ${timeRange}",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "Duration: ${String.format("%.1f", timeRange.getDurationHours())} hours",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 12.sp
+                        )
+                    } else {
+                        val duration = timeRange.getDurationHours()
+                        val errorMessage = when {
+                            duration < 1f -> "Duration must be at least 1 hour"
+                            duration > 2f -> "Duration cannot exceed 2 hours"
+                            else -> "Invalid time range"
                         }
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red.copy(alpha = 0.8f),
+                            fontSize = 12.sp
+                        )
                     }
                 }
 
@@ -267,7 +205,8 @@ fun TimePickerDialog(
                         modifier = Modifier.weight(1f),
                         enabled = isValidRange,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF667eea),
+                            containerColor = Color.White,
+                            contentColor = Color.Black,
                             disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
                         ),
                         shape = RoundedCornerShape(12.dp)
@@ -294,46 +233,40 @@ fun TimeSelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Hour selector
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.weight(1f)
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                text = "Hour",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                TextButton(
+                    onClick = { onHourChange((hour - 1 + 24) % 24) }
+                ) {
+                    Text("-", color = Color.White, fontSize = 20.sp)
+                }
+
                 Text(
-                    text = "Hour",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp
+                    text = String.format("%02d", hour),
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(40.dp),
+                    textAlign = TextAlign.Center
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                TextButton(
+                    onClick = { onHourChange((hour + 1) % 24) }
                 ) {
-                    IconButton(
-                        onClick = { onHourChange((hour - 1 + 24) % 24) }
-                    ) {
-                        Text("-", color = Color.White, fontSize = 20.sp)
-                    }
-
-                    Text(
-                        text = String.format("%02d", hour),
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(40.dp),
-                        textAlign = TextAlign.Center
-                    )
-
-                    IconButton(
-                        onClick = { onHourChange((hour + 1) % 24) }
-                    ) {
-                        Text("+", color = Color.White, fontSize = 20.sp)
-                    }
+                    Text("+", color = Color.White, fontSize = 20.sp)
                 }
             }
         }
@@ -346,46 +279,40 @@ fun TimeSelector(
         )
 
         // Minute selector
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.weight(1f)
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                text = "Minute",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 12.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                TextButton(
+                    onClick = { onMinuteChange((minute - 15 + 60) % 60) }
+                ) {
+                    Text("-", color = Color.White, fontSize = 20.sp)
+                }
+
                 Text(
-                    text = "Minute",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp
+                    text = String.format("%02d", minute),
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(40.dp),
+                    textAlign = TextAlign.Center
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                TextButton(
+                    onClick = { onMinuteChange((minute + 15) % 60) }
                 ) {
-                    IconButton(
-                        onClick = { onMinuteChange((minute - 15 + 60) % 60) }
-                    ) {
-                        Text("-", color = Color.White, fontSize = 20.sp)
-                    }
-
-                    Text(
-                        text = String.format("%02d", minute),
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(40.dp),
-                        textAlign = TextAlign.Center
-                    )
-
-                    IconButton(
-                        onClick = { onMinuteChange((minute + 15) % 60) }
-                    ) {
-                        Text("+", color = Color.White, fontSize = 20.sp)
-                    }
+                    Text("+", color = Color.White, fontSize = 20.sp)
                 }
             }
         }
