@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -43,6 +44,11 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             var showSettings by remember { mutableStateOf(false) }
 
+            // Handle system back press
+            BackHandler(enabled = showSettings) {
+                showSettings = false
+            }
+
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!isDefaultLauncher(context)) {
                     DefaultLauncherPrompt(onSetDefault = {
@@ -69,7 +75,8 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
         }
-        val resolveInfo = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        val resolveInfo =
+            context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolveInfo?.activityInfo?.packageName == context.packageName
     }
 

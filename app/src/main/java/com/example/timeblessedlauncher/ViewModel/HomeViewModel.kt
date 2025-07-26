@@ -14,6 +14,7 @@ class AppViewModel(private val context: Context) : ViewModel() {
 
     private val database = AppDatabase.getDatabase(context)
     private val dao = database.appRestrictionDao()
+    private val favoriteDao = database.favoriteAppDao() // New DAO for favorites
 
     private val _allApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val allApps: StateFlow<List<AppInfo>> = _allApps.asStateFlow()
@@ -24,8 +25,21 @@ class AppViewModel(private val context: Context) : ViewModel() {
     private val _hiddenAppsCount = MutableStateFlow(0)
     val hiddenAppsCount: StateFlow<Int> = _hiddenAppsCount.asStateFlow()
 
+    // New StateFlow for favorite apps
+    private val _favoriteApps = MutableStateFlow<List<AppInfo>>(emptyList())
+    val favoriteApps: StateFlow<List<AppInfo>> = _favoriteApps.asStateFlow()
+
     // Get all app restrictions from database
     val appRestrictions: StateFlow<List<AppRestriction>> = dao.getAllRestrictions()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    // Get favorite apps from database
+    private val favoritePackageNames: StateFlow<List<String>> = favoriteDao.getAllFavorites()
+        .map { favorites -> favorites.map { it.packageName } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -37,6 +51,15 @@ class AppViewModel(private val context: Context) : ViewModel() {
         viewModelScope.launch {
             appRestrictions.collect {
                 updateVisibleApps()
+            }
+        }
+
+        // Observe favorite package names and update favorite apps
+        viewModelScope.launch {
+            combine(favoritePackageNames, _allApps) { favorites, apps ->
+                apps.filter { app -> favorites.contains(app.packageName) }
+            }.collect { favoriteApps ->
+                _favoriteApps.value = favoriteApps
             }
         }
     }
@@ -60,6 +83,37 @@ class AppViewModel(private val context: Context) : ViewModel() {
 
             _allApps.value = apps
             updateVisibleApps()
+        }
+    }
+
+    fun toggleFavorite(packageName: String) {
+        viewModelScope.launch {
+            val app = _allApps.value.find { it.packageName == packageName }
+            if (app != null) {
+                val existingFavorite = favoriteDao.getFavorite(packageName)
+                if (existingFavorite != null) {
+                    // Remove from favorites
+                    favoriteDao.delete(existingFavorite)
+                } else {
+                    // Add to favorites
+                    val favoriteApp = FavoriteApp(
+                        packageName = packageName,
+                        appName = app.name,
+                        addedAt = System.currentTimeMillis()
+                    )
+                    favoriteDao.insert(favoriteApp)
+                }
+            }
+        }
+    }
+
+    fun isFavorite(packageName: String): Boolean {
+        return favoritePackageNames.value.contains(packageName)
+    }
+
+    fun clearAllFavorites() {
+        viewModelScope.launch {
+            favoriteDao.clearAll()
         }
     }
 

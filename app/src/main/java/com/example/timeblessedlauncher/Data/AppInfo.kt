@@ -20,6 +20,13 @@ data class AppRestriction(
     val customLabel: String? = null
 )
 
+@Entity(tableName = "favorite_apps")
+data class FavoriteApp(
+    @PrimaryKey val packageName: String,
+    val appName: String,
+    val addedAt: Long = System.currentTimeMillis()
+)
+
 enum class AppCategory {
     ESSENTIAL,      // Phone, Messages, Camera, etc.
     SOCIAL,         // Instagram, Facebook, Twitter
@@ -98,13 +105,38 @@ interface AppRestrictionDao {
     fun getRestrictedApps(): Flow<List<AppRestriction>>
 }
 
+@Dao
+interface FavoriteAppDao {
+    @Query("SELECT * FROM favorite_apps ORDER BY addedAt DESC")
+    fun getAllFavorites(): Flow<List<FavoriteApp>>
+
+    @Query("SELECT * FROM favorite_apps WHERE packageName = :packageName")
+    suspend fun getFavorite(packageName: String): FavoriteApp?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(favoriteApp: FavoriteApp)
+
+    @Delete
+    suspend fun delete(favoriteApp: FavoriteApp)
+
+    @Query("DELETE FROM favorite_apps WHERE packageName = :packageName")
+    suspend fun deleteByPackageName(packageName: String)
+
+    @Query("DELETE FROM favorite_apps")
+    suspend fun clearAll()
+
+    @Query("SELECT COUNT(*) FROM favorite_apps")
+    suspend fun getFavoriteCount(): Int
+}
+
 @Database(
-    entities = [AppRestriction::class],
-    version = 1,
+    entities = [AppRestriction::class, FavoriteApp::class],
+    version = 2, // Increment version due to new entity
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appRestrictionDao(): AppRestrictionDao
+    abstract fun favoriteAppDao(): FavoriteAppDao
 
     companion object {
         @Volatile
@@ -116,7 +148,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // For simplicity, you can implement proper migration later
+                    .build()
                 INSTANCE = instance
                 instance
             }
